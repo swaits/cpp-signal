@@ -35,14 +35,22 @@ class Slot===NARG===_function: public Slot===NARG===<T_return===TEMPLATE_ARG===>
 {
 	public:
 
-		typedef T_return (*FUNCTION_POINTER)(===FORMAL_ARG_DECL===);
+		typedef T_return (*FUNCTION_POINTER)(===FORMAL_ARG_DECL===); // convenience typedef
 
+		/**
+		 * Constructor. Converts a function pointer into raw data.
+		 */
 		Slot===NARG===_function( const FUNCTION_POINTER func )
 		{
 			// convert and store function pointer in slot_base
 			this->data[0] = safe_horrible_cast<data_container>(func);
 		}
 
+		/**
+		 * Perform callback. Converts raw data back into a function pointer, and calls it.
+		 *
+		 * @return Returns an object of type T_return; the result of the user callback.
+		 */
 		T_return operator() (===FORMAL_ARG_DECL===) const
 		{
 			// retrieve data from slot_base and convert back to a function pointer
