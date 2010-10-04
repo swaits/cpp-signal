@@ -1,6 +1,6 @@
 
-#ifndef __Signal0_h__
-#define __Signal0_h__
+#ifndef __Signal8_h__
+#define __Signal8_h__
 
 #include "horrible_cast.h"
 #include "slot_base.h"
@@ -11,10 +11,10 @@
 // Slot tempplate.
 //=========================================================================================================================================
 /**
- * Abstract base class for Slots with 0 parameter(s).
+ * Abstract base class for Slots with 8 parameter(s).
  */
-template<typename T_return>
-class Slot0 : public slot_base
+template<typename T_return, typename T_arg0, typename T_arg1, typename T_arg2, typename T_arg3, typename T_arg4, typename T_arg5, typename T_arg6, typename T_arg7>
+class Slot8 : public slot_base
 {
 	public:
 		/**
@@ -22,33 +22,33 @@ class Slot0 : public slot_base
 		 * 
 		 * @return Returns an object of type T_return; the result of the user callback.
 		 */
-		virtual T_return operator() () const = 0;
+		virtual T_return operator() (T_arg0 a0, T_arg1 a1, T_arg2 a2, T_arg3 a3, T_arg4 a4, T_arg5 a5, T_arg6 a6, T_arg7 a7) const = 0;
 };
 
 
 //
 // a concrete Slot class for a normal function
 //
-template <typename T_return>
-class Slot0_function: public Slot0<T_return>
+template <typename T_return, typename T_arg0, typename T_arg1, typename T_arg2, typename T_arg3, typename T_arg4, typename T_arg5, typename T_arg6, typename T_arg7>
+class Slot8_function: public Slot8<T_return, T_arg0, T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6, T_arg7>
 {
 	public:
 
-		typedef T_return (*FUNCTION_POINTER)();
+		typedef T_return (*FUNCTION_POINTER)(T_arg0 a0, T_arg1 a1, T_arg2 a2, T_arg3 a3, T_arg4 a4, T_arg5 a5, T_arg6 a6, T_arg7 a7);
 
-		Slot0_function( const FUNCTION_POINTER func )
+		Slot8_function( const FUNCTION_POINTER func )
 		{
 			// convert and store function pointer in slot_base
 			this->data[0] = safe_horrible_cast<slot_base::data_container>(func);
 		}
 
-		T_return operator() () const
+		T_return operator() (T_arg0 a0, T_arg1 a1, T_arg2 a2, T_arg3 a3, T_arg4 a4, T_arg5 a5, T_arg6 a6, T_arg7 a7) const
 		{
 			// retrieve data from slot_base and convert back to a function pointer
 			FUNCTION_POINTER func = dangerous_horrible_cast<FUNCTION_POINTER>(this->data[0]);
 
 			// call function
-			return func();
+			return func(a0, a1, a2, a3, a4, a5, a6, a7);
 		}
 };
 
@@ -56,34 +56,34 @@ class Slot0_function: public Slot0<T_return>
 //
 // a concrete Slot class for an object pointer and method (usually 'this' and 'Class::Method')
 //
-template <class T_object, typename T_member, typename T_return> 
-class Slot0_method: public Slot0<T_return>
+template <class T_object, typename T_member, typename T_return, typename T_arg0, typename T_arg1, typename T_arg2, typename T_arg3, typename T_arg4, typename T_arg5, typename T_arg6, typename T_arg7> 
+class Slot8_method: public Slot8<T_return, T_arg0, T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6, T_arg7>
 {
 	public:
 
-		Slot0_method(const T_object* p_object, const T_member p_member)
+		Slot8_method(const T_object* p_object, const T_member p_member)
 		{
 			// convert and store object pointer and member function pointer in slot_base
 			this->data[0] = safe_horrible_cast<slot_base::data_container>(p_object);
 			this->data[1] = safe_horrible_cast<slot_base::data_container>(p_member);
 		}
 
-		T_return operator() () const
+		T_return operator() (T_arg0 a0, T_arg1 a1, T_arg2 a2, T_arg3 a3, T_arg4 a4, T_arg5 a5, T_arg6 a6, T_arg7 a7) const
 		{
 			// retrieve data from slot_base and convert back to an object pointer and member function pointer
 			T_object* p_object = dangerous_horrible_cast<T_object*>(this->data[0]);
 			T_member  p_member = dangerous_horrible_cast<T_member> (this->data[1]);
 
 			// call member function
-			return (p_object->*p_member)();
+			return (p_object->*p_member)(a0, a1, a2, a3, a4, a5, a6, a7);
 		}
 };
 
 //=========================================================================================================================================
 // Signal tempplate.
 //=========================================================================================================================================
-template< typename T_return >
-class Signal0: public signal_base
+template< typename T_return, typename T_arg0, typename T_arg1, typename T_arg2, typename T_arg3, typename T_arg4, typename T_arg5, typename T_arg6, typename T_arg7 >
+class Signal8: public signal_base
 {
 	public:
 
@@ -91,12 +91,12 @@ class Signal0: public signal_base
 		// Execute the Signal: 
 		// - Walk the list of Slot nodes.
 		//-----------------------------------------------------------------------------------------------------------------------------------------
-		void operator() ()
+		void operator() (T_arg0 a0, T_arg1 a1, T_arg2 a2, T_arg3 a3, T_arg4 a4, T_arg5 a5, T_arg6 a6, T_arg7 a7)
 		{
 			if( IsSignalEmitting( ) )
 			{
 #if defined( _DEBUG )
-				printf("WARNING: Signal0<...> @ 0x%p recursive Emit attempt\n", this);
+				printf("WARNING: Signal8<...> @ 0x%p recursive Emit attempt\n", this);
 #endif
 				return;
 			}
@@ -108,11 +108,11 @@ class Signal0: public signal_base
 			// iterate through the list
 			while( cur )
 			{
-				// make the slot_base pointer a Slot0 pointer
-				Slot0<T_return>* s = static_cast<Slot0<T_return>*>(cur->slot);
+				// make the slot_base pointer a Slot8 pointer
+				Slot8<T_return, T_arg0, T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6, T_arg7>* s = static_cast<Slot8<T_return, T_arg0, T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6, T_arg7>*>(cur->slot);
 
 				// call the Signal
-				(*s)();
+				(*s)(a0, a1, a2, a3, a4, a5, a6, a7);
 
 				// move to next Slot in the list.
 				cur = cur->next;
@@ -124,14 +124,14 @@ class Signal0: public signal_base
 		//=========================================================================================================================================
 		// Signal connections
 		//=========================================================================================================================================
-		typedef T_return (*FUNCTION_POINTER)();
+		typedef T_return (*FUNCTION_POINTER)(T_arg0 a0, T_arg1 a1, T_arg2 a2, T_arg3 a3, T_arg4 a4, T_arg5 a5, T_arg6 a6, T_arg7 a7);
 
 		// Functions
 		//-----------------------------------------------------------------------------------------------------------------------------------------
 		bool Connect( FUNCTION_POINTER func )
 		{
 			// make a copy of the Slot to store in our list
-			Slot0<T_return>* sNewFunc = new Slot0_function<T_return>( func );
+			Slot8<T_return, T_arg0, T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6, T_arg7>* sNewFunc = new Slot8_function<T_return, T_arg0, T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6, T_arg7>( func );
 
 			// add it to the end of our linked list
 			return bind(sNewFunc);
@@ -143,7 +143,7 @@ class Signal0: public signal_base
 		bool Connect(T_object* p_object, T_member p_member)
 		{
 			// make a copy of the Slot to store in our list
-			Slot0<T_return>* sNewMethod = new Slot0_method<T_object,T_member,T_return>( p_object, p_member );
+			Slot8<T_return, T_arg0, T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6, T_arg7>* sNewMethod = new Slot8_method<T_object,T_member,T_return, T_arg0, T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6, T_arg7>( p_object, p_member );
 
 			// add it to the end of our linked list
 			return bind(sNewMethod);
@@ -158,7 +158,7 @@ class Signal0: public signal_base
 		bool Disconnect( FUNCTION_POINTER func )
 		{
 			// make a temporary Slot we can use to find a match in the list
-			Slot0_function<T_return> sTest( func );
+			Slot8_function<T_return, T_arg0, T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6, T_arg7> sTest( func );
 
 			// search and remove it
 			return unbind(&sTest);
@@ -171,11 +171,11 @@ class Signal0: public signal_base
 		bool Disconnect(T_object* p_object, T_member p_member)
 		{
 			// make a temporary Slot we can use to find a match in the list
-			Slot0_method<T_object,T_member,T_return> sTemp(p_object,p_member);
+			Slot8_method<T_object,T_member,T_return, T_arg0, T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6, T_arg7> sTemp(p_object,p_member);
 
 			// search and remove it
 			return unbind(&sTemp);
 		}
 };
 
-#endif // __Signal0_h__
+#endif // __Signal8_h__

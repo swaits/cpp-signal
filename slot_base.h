@@ -5,21 +5,21 @@ class slot_base
 {
 	public:
 
-		slot_base ();  // constructor
+		slot_base ();          // constructor
 		virtual ~slot_base (); // destructor
-
-		/* Use compiler-generated copy constructor, assignment operator */
 
 		bool operator== (const slot_base& other) const;
 
+		// note: copy constructor, assignment operator not specified. use compiler-generated versions.
+
 	protected:
 
-		// a generic type to hold a pointer, virtual method function pointer, etc.
+		// a generic type to hold a chunk of raw data. we use it to store a pointer, virtual method function pointer, etc.
 		struct data_container
 		{
 			// should be at least as large as the largest type you want
 			// to store in one of these
-			enum { SIZE_IN_WORDS = 4 };
+			enum { SIZE_IN_WORDS = 8 };
 			enum { SIZE_IN_BYTES = SIZE_IN_WORDS*sizeof(unsigned int) };
 
 			// the actual storage space

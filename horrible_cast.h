@@ -2,7 +2,7 @@
 #define __horrible_cast_h__
 
 
-// horrible_union is used by {safe|dangerous}_horrible_cast to copy one arbitrary type to another
+//horrible_union is used by {safe|dangerous}_horrible_cast to copy one arbitrary type to another
 template <typename t_out, typename t_in>
 union horrible_union
 {

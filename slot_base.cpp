@@ -3,9 +3,7 @@
 		
 bool slot_base::data_container::operator== (const slot_base::data_container& other) const
 {
-	// TODO: should use memcmp or equivalent
-	
-	// do a bytewise comparison
+	// do a wordwise comparison
 	for (int i=0;i<SIZE_IN_WORDS;++i)
 	{
 		if ( this->data[i] != other.data[i] )
@@ -27,7 +25,6 @@ void slot_base::data_container::zero()
 	}
 }
 
-		
 slot_base::slot_base ()
 {
 	for (int i=0;i<NUM_DATA_ITEMS;++i)
