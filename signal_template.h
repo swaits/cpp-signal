@@ -8,7 +8,7 @@
 
 
 //
-// Slot ===NARG===
+// classes Slot===NARG===, Slot===NARG===_function, and Slot===NARG===_method
 //
 
 //
@@ -26,7 +26,6 @@ class Slot===NARG=== : public slot_base
 		virtual T_return operator() (===FORMAL_ARG_DECL===) const = 0;
 };
 
-
 //
 // A concrete Slot class for a normal function.
 //
@@ -38,7 +37,9 @@ class Slot===NARG===_function: public Slot===NARG===<T_return===TEMPLATE_ARG===>
 		typedef T_return (*FUNCTION_POINTER)(===FORMAL_ARG_DECL===); // convenience typedef
 
 		/**
-		 * Constructor. Converts a function pointer into raw data.
+		 * Constructor.
+		 *
+		 * Converts a function pointer into raw data.
 		 */
 		Slot===NARG===_function( const FUNCTION_POINTER func )
 		{
@@ -47,7 +48,9 @@ class Slot===NARG===_function: public Slot===NARG===<T_return===TEMPLATE_ARG===>
 		}
 
 		/**
-		 * Perform callback. Converts raw data back into a function pointer, and calls it.
+		 * Perform callback.
+		 *
+		 * Converts raw data back into a function pointer, and calls it.
 		 *
 		 * @return Returns an object of type T_return; the result of the user callback.
 		 */
@@ -69,6 +72,11 @@ class Slot===NARG===_method: public Slot===NARG===<T_return===TEMPLATE_ARG===>
 {
 	public:
 
+		/**
+		 * Constructor.
+		 *
+		 * Converts an object and method pointer into raw data.
+		 */
 		Slot===NARG===_method(const T_object* p_object, const T_member p_member)
 		{
 			// convert and store object pointer and member function pointer in slot_base
@@ -76,6 +84,13 @@ class Slot===NARG===_method: public Slot===NARG===<T_return===TEMPLATE_ARG===>
 			this->data[1] = safe_horrible_cast<data_container>(p_member);
 		}
 
+		/**
+		 * Perform callback.
+		 *
+		 * Converts raw data back into a method pointer, and calls it.
+		 *
+		 * @return Returns an object of type T_return; the result of the user callback.
+		 */
 		T_return operator() (===FORMAL_ARG_DECL===) const
 		{
 			// retrieve data from slot_base and convert back to an object pointer and member function pointer
@@ -90,14 +105,18 @@ class Slot===NARG===_method: public Slot===NARG===<T_return===TEMPLATE_ARG===>
 
 
 //
-// Signal ===NARG===
+// class Signal ===NARG===
 //
 template< typename T_return===TEMPLATE_ARG_DECL=== >
 class Signal===NARG===: public signal_base
 {
 	public:
 
-		// Emit the signal. Iterate through the list of slots, and call each one.
+		/**
+		 * Emit the signal.
+		 *
+		 * Iterate through the list of slots, and call each one.
+		 */
 		void operator() (===FORMAL_ARG_DECL===)
 		{
 			// if we're already emitting, return (i.e. no re-entrancy)
@@ -132,11 +151,13 @@ class Signal===NARG===: public signal_base
 
 
 		//
-		// Signal connections
+		// signal connections to slots
 		//
 
+		// convenience typedef
+		typedef T_return (*FUNCTION_POINTER)(===FORMAL_ARG_DECL===);  
+
 		// connect to normal functions
-		typedef T_return (*FUNCTION_POINTER)(===FORMAL_ARG_DECL===);  // helper typedef
 		bool Connect( FUNCTION_POINTER func )
 		{
 			// make a copy of the Slot to store in our list
@@ -151,7 +172,7 @@ class Signal===NARG===: public signal_base
 		bool Connect(T_object* p_object, T_member p_member)
 		{
 			// make a copy of the Slot to store in our list
-			Slot===NARG===<T_return===TEMPLATE_ARG===>* sNewMethod = new Slot===NARG===_method<T_object,T_member,T_return===TEMPLATE_ARG===>( p_object, p_member );
+			Slot===NARG===<T_return===TEMPLATE_ARG===>* sNewMethod =new Slot===NARG===_method<T_object,T_member,T_return===TEMPLATE_ARG===>( p_object, p_member );
 
 			// add it to the end of our linked list
 			return bind(sNewMethod);
@@ -159,7 +180,7 @@ class Signal===NARG===: public signal_base
 
 
 		//
-		// signal disconnections
+		// signal disconnections from slots
 		//
 
 		// disconnect from a normal function
