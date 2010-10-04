@@ -2,7 +2,7 @@
 #include "signal_base.h"
 
 
-signal_base::signal_base() : head(0), tail(0), bEmitting(false)
+signal_base::signal_base() : head(0), tail(0), emitting(false)
 {
 	// empty
 }
@@ -13,7 +13,7 @@ signal_base::~signal_base()
 	clear_list();
 }
 
-signal_base::signal_base( const signal_base& rSource ) : head(0), tail(0), bEmitting(false)
+signal_base::signal_base( const signal_base& rSource ) : head(0), tail(0), emitting(false)
 {
 	// Set an assert to let the user know that we don't support signal copying.
 	// There are too many places where the signals are directly connected to objects, 

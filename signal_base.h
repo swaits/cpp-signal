@@ -32,7 +32,7 @@ class signal_base
 		/**
 		 * Determines the number of slots that are connected to the signal.
 		 */
-		int Count( void );
+		int count( void );
 
 	protected:
 		// linked list data structure
@@ -97,12 +97,16 @@ class signal_base
 		 */
 		void remove_from_list(list_node* n);
 
+	protected:
+
 		/**
 		 * Removes any nodes that were tagged for deletion during the signal emit sequence
 		 */
 		void remove_pending_nodes( void );
 
 		//-----------------------------------------------------------------------------------------------------------------------------------------
+	protected:
+
 		list_node* head;
 		list_node* tail;
 

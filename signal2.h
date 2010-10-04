@@ -15,7 +15,7 @@
 // Abstract base class for slots with 2 parameter(s).
 //
 template<typename T_return, typename T_arg0, typename T_arg1>
-class slot2 : public slot_base
+class slot2: public slot_base
 {
 	public:
 		/**
@@ -164,7 +164,7 @@ class signal2: public signal_base
 		typedef T_return (*FUNCTION_POINTER)(T_arg0 a0, T_arg1 a1);
 
 		// connect to normal functions
-		bool Connect( FUNCTION_POINTER func )
+		bool connect( FUNCTION_POINTER func )
 		{
 			// make a copy of the slot to store in our list
 			slot2<T_return, T_arg0, T_arg1>* sNewFunc = new slot2_function<T_return, T_arg0, T_arg1>( func );
@@ -175,7 +175,7 @@ class signal2: public signal_base
 
 		// connect to an object's method
 		template <class T_object, typename T_member>
-		bool Connect(T_object* p_object, T_member p_member)
+		bool connect(T_object* p_object, T_member p_member)
 		{
 			// make a copy of the slot to store in our list
 			slot2<T_return, T_arg0, T_arg1>* sNewMethod = new slot2_method<T_object,T_member,T_return, T_arg0, T_arg1>( p_object, p_member );
@@ -190,7 +190,7 @@ class signal2: public signal_base
 		//
 
 		// disconnect from a normal function
-		bool Disconnect( FUNCTION_POINTER func )
+		bool disconnect( FUNCTION_POINTER func )
 		{
 			// make a temporary slot we can use to find a match in the list
 			slot2_function<T_return, T_arg0, T_arg1> sTest( func );
@@ -201,7 +201,7 @@ class signal2: public signal_base
 
 		// disconnect from an object's method
 		template <class T_object, typename T_member>
-		bool Disconnect(T_object* p_object, T_member p_member)
+		bool disconnect(T_object* p_object, T_member p_member)
 		{
 			// make a temporary slot we can use to find a match in the list
 			slot2_method<T_object,T_member,T_return, T_arg0, T_arg1> sTemp(p_object,p_member);

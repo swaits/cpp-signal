@@ -15,7 +15,7 @@
 // Abstract base class for slots with 15 parameter(s).
 //
 template<typename T_return, typename T_arg0, typename T_arg1, typename T_arg2, typename T_arg3, typename T_arg4, typename T_arg5, typename T_arg6, typename T_arg7, typename T_arg8, typename T_arg9, typename T_arg10, typename T_arg11, typename T_arg12, typename T_arg13, typename T_arg14>
-class slot15 : public slot_base
+class slot15: public slot_base
 {
 	public:
 		/**
@@ -164,7 +164,7 @@ class signal15: public signal_base
 		typedef T_return (*FUNCTION_POINTER)(T_arg0 a0, T_arg1 a1, T_arg2 a2, T_arg3 a3, T_arg4 a4, T_arg5 a5, T_arg6 a6, T_arg7 a7, T_arg8 a8, T_arg9 a9, T_arg10 a10, T_arg11 a11, T_arg12 a12, T_arg13 a13, T_arg14 a14);
 
 		// connect to normal functions
-		bool Connect( FUNCTION_POINTER func )
+		bool connect( FUNCTION_POINTER func )
 		{
 			// make a copy of the slot to store in our list
 			slot15<T_return, T_arg0, T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6, T_arg7, T_arg8, T_arg9, T_arg10, T_arg11, T_arg12, T_arg13, T_arg14>* sNewFunc = new slot15_function<T_return, T_arg0, T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6, T_arg7, T_arg8, T_arg9, T_arg10, T_arg11, T_arg12, T_arg13, T_arg14>( func );
@@ -175,7 +175,7 @@ class signal15: public signal_base
 
 		// connect to an object's method
 		template <class T_object, typename T_member>
-		bool Connect(T_object* p_object, T_member p_member)
+		bool connect(T_object* p_object, T_member p_member)
 		{
 			// make a copy of the slot to store in our list
 			slot15<T_return, T_arg0, T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6, T_arg7, T_arg8, T_arg9, T_arg10, T_arg11, T_arg12, T_arg13, T_arg14>* sNewMethod = new slot15_method<T_object,T_member,T_return, T_arg0, T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6, T_arg7, T_arg8, T_arg9, T_arg10, T_arg11, T_arg12, T_arg13, T_arg14>( p_object, p_member );
@@ -190,7 +190,7 @@ class signal15: public signal_base
 		//
 
 		// disconnect from a normal function
-		bool Disconnect( FUNCTION_POINTER func )
+		bool disconnect( FUNCTION_POINTER func )
 		{
 			// make a temporary slot we can use to find a match in the list
 			slot15_function<T_return, T_arg0, T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6, T_arg7, T_arg8, T_arg9, T_arg10, T_arg11, T_arg12, T_arg13, T_arg14> sTest( func );
@@ -201,7 +201,7 @@ class signal15: public signal_base
 
 		// disconnect from an object's method
 		template <class T_object, typename T_member>
-		bool Disconnect(T_object* p_object, T_member p_member)
+		bool disconnect(T_object* p_object, T_member p_member)
 		{
 			// make a temporary slot we can use to find a match in the list
 			slot15_method<T_object,T_member,T_return, T_arg0, T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6, T_arg7, T_arg8, T_arg9, T_arg10, T_arg11, T_arg12, T_arg13, T_arg14> sTemp(p_object,p_member);

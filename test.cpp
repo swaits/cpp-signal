@@ -2,8 +2,7 @@
 #include <cstring>
 
 
-#include "slot.h"
-#include "signal0.h"
+#include "signal.h"
 
 class ParentFoo
 {
@@ -35,37 +34,29 @@ public:
 	}
 };
 
-Foo f;
-
 bool somefunc()
 {
 	printf("some func\n");
 	return true;
 }
 
-template <class T_class, typename T_method>
-slot0_method<T_class,T_method>* make_slot(T_class* c, T_method m)
+void anotherfunc(int x)
 {
-	return new slot0_method<T_class,T_method>(c,m);
+	printf("got %d\n",x);
 }
 
 int main(int argc, char** argv)
 {
-	slot0* s = make_slot(&f,&Foo::Bar);
-	slot0* t = make_slot(&f,&ParentFoo::Bar);
+	Foo f;
 
-	slot0_function<bool> x( somefunc );
-	slot0* u = &x;
-
-	if ( *s == *t )
-		(*s)();
-
-	(*u)();
-
-	signal0 sig;
+	signal<bool> sig;
 	sig.connect(&f,&Foo::Bar);
+	sig.connect(&f,&ParentFoo::Bar);
+	sig.connect(&somefunc);
 	sig();
+
+	signal<void,int> sigx;
+	sigx.connect(&anotherfunc);
+	sigx(12);
+	sigx(999);
 }
-
-
-
