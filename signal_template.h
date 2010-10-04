@@ -8,14 +8,14 @@
 
 
 //
-// classes Slot===NARG===, Slot===NARG===_function, and Slot===NARG===_method
+// classes slot===NARG===, slot===NARG===_function, and slot===NARG===_method
 //
 
 //
-// Abstract base class for Slots with ===NARG=== parameter(s).
+// Abstract base class for slots with ===NARG=== parameter(s).
 //
 template<typename T_return===TEMPLATE_ARG_DECL===>
-class Slot===NARG=== : public slot_base
+class slot===NARG=== : public slot_base
 {
 	public:
 		/**
@@ -27,10 +27,10 @@ class Slot===NARG=== : public slot_base
 };
 
 //
-// A concrete Slot class for a normal function.
+// A concrete slot class for a normal function.
 //
 template <typename T_return===TEMPLATE_ARG_DECL===>
-class Slot===NARG===_function: public Slot===NARG===<T_return===TEMPLATE_ARG===>
+class slot===NARG===_function: public slot===NARG===<T_return===TEMPLATE_ARG===>
 {
 	public:
 
@@ -41,10 +41,10 @@ class Slot===NARG===_function: public Slot===NARG===<T_return===TEMPLATE_ARG===>
 		 *
 		 * Converts a function pointer into raw data.
 		 */
-		Slot===NARG===_function( const FUNCTION_POINTER func )
+		slot===NARG===_function( const FUNCTION_POINTER func )
 		{
 			// convert and store function pointer in slot_base
-			this->data[0] = safe_horrible_cast<data_container>(func);
+			this->data[0] = safe_horrible_cast<slot_base::data_container>(func);
 		}
 
 		/**
@@ -65,10 +65,10 @@ class Slot===NARG===_function: public Slot===NARG===<T_return===TEMPLATE_ARG===>
 };
 
 //
-// A concrete Slot class for an object pointer and method (usually 'this' and 'Class::Method').
+// A concrete slot class for an object pointer and method (usually 'this' and 'Class::Method').
 //
 template <class T_object, typename T_member, typename T_return===TEMPLATE_ARG_DECL===> 
-class Slot===NARG===_method: public Slot===NARG===<T_return===TEMPLATE_ARG===>
+class slot===NARG===_method: public slot===NARG===<T_return===TEMPLATE_ARG===>
 {
 	public:
 
@@ -77,11 +77,11 @@ class Slot===NARG===_method: public Slot===NARG===<T_return===TEMPLATE_ARG===>
 		 *
 		 * Converts an object and method pointer into raw data.
 		 */
-		Slot===NARG===_method(const T_object* p_object, const T_member p_member)
+		slot===NARG===_method(const T_object* p_object, const T_member p_member)
 		{
 			// convert and store object pointer and member function pointer in slot_base
-			this->data[0] = safe_horrible_cast<data_container>(p_object);
-			this->data[1] = safe_horrible_cast<data_container>(p_member);
+			this->data[0] = safe_horrible_cast<slot_base::data_container>(p_object);
+			this->data[1] = safe_horrible_cast<slot_base::data_container>(p_member);
 		}
 
 		/**
@@ -105,10 +105,10 @@ class Slot===NARG===_method: public Slot===NARG===<T_return===TEMPLATE_ARG===>
 
 
 //
-// class Signal ===NARG===
+// class signal===NARG===
 //
 template< typename T_return===TEMPLATE_ARG_DECL=== >
-class Signal===NARG===: public signal_base
+class signal===NARG===: public signal_base
 {
 	public:
 
@@ -119,34 +119,40 @@ class Signal===NARG===: public signal_base
 		 */
 		void operator() (===FORMAL_ARG_DECL===)
 		{
-			// if we're already emitting, return (i.e. no re-entrancy)
-			if( IsSignalEmitting() )
+			// if we're already emitting, return (i.e. no re-entrancy allowed)
+			if( signal_base::emitting )
 			{
 #if defined( _DEBUG )
-				printf("WARNING: Signal===NARG===<...> @ 0x%p recursive Emit attempt\n", this);
+				printf("WARNING: signal===NARG===<...> @ 0x%p recursive emit attempt\n", this);
 #endif
 				return;
 			}
 
 			// set emitting flag
-			BeginEmit();
+			signal_base::emitting = true;
 
 			// iterate through the list
-			list_node* cur = GetFirstNode();
+			signal_base::list_node* cur = signal_base::head;
 			while( cur )
 			{
-				// make the slot_base pointer a Slot===NARG=== pointer
-				Slot===NARG===<T_return===TEMPLATE_ARG===>* s = static_cast<Slot===NARG===<T_return===TEMPLATE_ARG===>*>(cur->slot);
+				// cast the slot_base pointer to a slot===NARG=== pointer (converts from raw memory to pointer again)
+				slot===NARG===<T_return===TEMPLATE_ARG===>* s = static_cast<slot===NARG===<T_return===TEMPLATE_ARG===>*>(cur->slot);
 
-				// call the Signal
-				(*s)(===FORMAL_ARG===);
+				// call the signal as long as it's still valid
+				if ( !cur->deleted )
+				{
+					(*s)(===FORMAL_ARG===);
+				}
 
-				// move to next Slot in the list.
+				// move to next slot in the list.
 				cur = cur->next;
 			}
 
+			// delete any pending slot deletions
+			signal_base::remove_pending_nodes( );
+
 			// clear emitting flag
-			EndEmit( );
+			signal_base::emitting = false;
 		}
 
 
@@ -155,27 +161,27 @@ class Signal===NARG===: public signal_base
 		//
 
 		// convenience typedef
-		typedef T_return (*FUNCTION_POINTER)(===FORMAL_ARG_DECL===);  
+		typedef T_return (*FUNCTION_POINTER)(===FORMAL_ARG_DECL===);
 
 		// connect to normal functions
 		bool Connect( FUNCTION_POINTER func )
 		{
-			// make a copy of the Slot to store in our list
-			Slot===NARG===<T_return===TEMPLATE_ARG===>* sNewFunc = new Slot===NARG===_function<T_return===TEMPLATE_ARG===>( func );
+			// make a copy of the slot to store in our list
+			slot===NARG===<T_return===TEMPLATE_ARG===>* sNewFunc = new slot===NARG===_function<T_return===TEMPLATE_ARG===>( func );
 
 			// add it to the end of our linked list
-			return bind(sNewFunc);
+			return signal_base::bind(sNewFunc);
 		}
 
 		// connect to an object's method
 		template <class T_object, typename T_member>
 		bool Connect(T_object* p_object, T_member p_member)
 		{
-			// make a copy of the Slot to store in our list
-			Slot===NARG===<T_return===TEMPLATE_ARG===>* sNewMethod =new Slot===NARG===_method<T_object,T_member,T_return===TEMPLATE_ARG===>( p_object, p_member );
+			// make a copy of the slot to store in our list
+			slot===NARG===<T_return===TEMPLATE_ARG===>* sNewMethod = new slot===NARG===_method<T_object,T_member,T_return===TEMPLATE_ARG===>( p_object, p_member );
 
 			// add it to the end of our linked list
-			return bind(sNewMethod);
+			return signal_base::bind(sNewMethod);
 		}
 
 
@@ -186,22 +192,22 @@ class Signal===NARG===: public signal_base
 		// disconnect from a normal function
 		bool Disconnect( FUNCTION_POINTER func )
 		{
-			// make a temporary Slot we can use to find a match in the list
-			Slot===NARG===_function<T_return===TEMPLATE_ARG===> sTest( func );
+			// make a temporary slot we can use to find a match in the list
+			slot===NARG===_function<T_return===TEMPLATE_ARG===> sTest( func );
 
 			// search and remove it
-			return unbind(&sTest);
+			return signal_base::unbind(&sTest);
 		}
 
 		// disconnect from an object's method
 		template <class T_object, typename T_member>
 		bool Disconnect(T_object* p_object, T_member p_member)
 		{
-			// make a temporary Slot we can use to find a match in the list
-			Slot===NARG===_method<T_object,T_member,T_return===TEMPLATE_ARG===> sTemp(p_object,p_member);
+			// make a temporary slot we can use to find a match in the list
+			slot===NARG===_method<T_object,T_member,T_return===TEMPLATE_ARG===> sTemp(p_object,p_member);
 
 			// search and remove it
-			return unbind(&sTemp);
+			return signal_base::unbind(&sTemp);
 		}
 };
 

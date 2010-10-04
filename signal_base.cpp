@@ -2,64 +2,56 @@
 #include "signal_base.h"
 
 
-//-----------------------------------------------------------------------------------------------------------------------------------------
 signal_base::signal_base() : head(0), tail(0), bEmitting(false)
 {
 	// empty
 }
 
-
-//-----------------------------------------------------------------------------------------------------------------------------------------
 signal_base::~signal_base()
 {
 	// clear the list
 	clear_list();
 }
 
-//-----------------------------------------------------------------------------------------------------------------------------------------
 signal_base::signal_base( const signal_base& rSource ) : head(0), tail(0), bEmitting(false)
 {
-	// Set an assert to let the user know that we don't support construction of a signal by copying another one.
-	// There are too many places where the signals are directly connected to objects, where copying them would create a disconnect
-	// between the signal and the objects that want to react to the signal execution.
+	// Set an assert to let the user know that we don't support signal copying.
+	// There are too many places where the signals are directly connected to objects, 
+	// where copying them would create a disconnect between the signal and the objects 
+	// that want to react to the signal execution.
 	assert( 0 );
 }
 
-//-----------------------------------------------------------------------------------------------------------------------------------------
 signal_base& signal_base::operator=( const signal_base& rSource )
 {
 	// Set an assert to let the user know that we don't support signal copying.
-	// There are too many places where the signals are directly connected to objects, where copying them would create a disconnect
-	// between the signal and the objects that want to react to the signal execution.
+	// There are too many places where the signals are directly connected to objects, 
+	// where copying them would create a disconnect between the signal and the objects 
+	// that want to react to the signal execution.
 	assert( 0 );
 	return *this;
 }
 
-//-----------------------------------------------------------------------------------------------------------------------------------------
-int signal_base::Count( void )
+int signal_base::count( void )
 {
-	int Count = 0;
+	int count = 0;
+	list_node* cur = head;
 
-	list_node* pIndex;
-	pIndex = head;
-
-	while( pIndex )
+	while( cur )
 	{
-		pIndex = pIndex->next;
-		Count++;
+		cur = cur->next;
+		count++;
 	}
 
-	return Count;
+	return count;
 }
 
-//-----------------------------------------------------------------------------------------------------------------------------------------
 bool signal_base::bind(slot_base* slot)
 {
 	// add it to our signal list
 	return add_to_list(slot);
 }
 
-//-----------------------------------------------------------------------------------------------------------------------------------------
 bool signal_base::unbind(slot_base* slot)
 {
 	// look for corresponding list_node in list
@@ -69,7 +61,7 @@ bool signal_base::unbind(slot_base* slot)
 	if( n )
 	{
 		// If we are not processing a signal emit sequence, then release the node.
-		if( !IsSignalEmitting( ) )
+		if( !emitting )
 		{
 			// take it out of the linked list
 			remove_from_list(n);
@@ -80,7 +72,7 @@ bool signal_base::unbind(slot_base* slot)
 		// Otherwise mark it for removal.
 		else
 		{
-			n->bDeleteRequested = true;
+			n->deleted = true;
 			return true;
 		}
 	}
@@ -89,16 +81,11 @@ bool signal_base::unbind(slot_base* slot)
 	return false;
 }
 
-//-----------------------------------------------------------------------------------------------------------------------------------------
-signal_base::list_node::list_node(slot_base* s) : slot(s),
-	prev(0),
-	next(0),
-	bDeleteRequested(false)
+signal_base::list_node::list_node(slot_base* s) : slot(s), prev(0), next(0), deleted(false)
 {
 	// empty
 }
 
-//-----------------------------------------------------------------------------------------------------------------------------------------
 signal_base::list_node::~list_node()
 {
 	// release the slot
@@ -106,13 +93,6 @@ signal_base::list_node::~list_node()
 }
 
 
-//-----------------------------------------------------------------------------------------------------------------------------------------
-signal_base::list_node* signal_base::GetFirstNode( void ) const
-{
-	return head;
-}
-
-//-----------------------------------------------------------------------------------------------------------------------------------------
 void signal_base::clear_list()
 {
 	// start at head
@@ -135,7 +115,6 @@ void signal_base::clear_list()
 	head = tail = 0;
 }
 
-//-----------------------------------------------------------------------------------------------------------------------------------------
 signal_base::list_node* signal_base::find_in_list(slot_base* slot) const
 {
 	// start search at head of list
@@ -159,7 +138,6 @@ signal_base::list_node* signal_base::find_in_list(slot_base* slot) const
 	return 0;
 }
 
-//-----------------------------------------------------------------------------------------------------------------------------------------
 bool signal_base::add_to_list(slot_base* slot)
 {
 	// a sanity check
@@ -194,7 +172,6 @@ bool signal_base::add_to_list(slot_base* slot)
 	return true;
 }
 
-//-----------------------------------------------------------------------------------------------------------------------------------------
 void signal_base::remove_from_list(list_node* n)
 {
 	// do a little sanity checking
@@ -228,44 +205,24 @@ void signal_base::remove_from_list(list_node* n)
 	delete n;
 }
 
-//-----------------------------------------------------------------------------------------------------------------------------------------
 void signal_base::remove_pending_nodes( void )
 {
-	list_node* pIndex;
-	list_node* pNext;
+	list_node* cur = head;
+	list_node* next;
 
-	pIndex = head;
-
-	while( pIndex )
+	while( cur )
 	{
 		// Prepare the next link in the list the removal stage.
-		pNext = pIndex->next;
+		next = cur->next;
 
 		// Do we need to remove this link.
-		if( pIndex->bDeleteRequested )
-			remove_from_list( pIndex );
+		if( cur->deleted )
+		{
+			remove_from_list( cur );
+		}
 
 		// Go to the next item.
-		pIndex = pNext;
+		cur = next;
 	}
 }
 
-//-----------------------------------------------------------------------------------------------------------------------------------------
-void signal_base::BeginEmit( void )
-{
-	bEmitting = true;
-}
-
-//-----------------------------------------------------------------------------------------------------------------------------------------
-void signal_base::EndEmit( void )
-{
-	bEmitting = false;
-
-	remove_pending_nodes( );
-}
-
-//-----------------------------------------------------------------------------------------------------------------------------------------
-bool signal_base::IsSignalEmitting( void ) const
-{
-	return bEmitting;
-}

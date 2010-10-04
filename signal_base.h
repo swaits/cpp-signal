@@ -47,7 +47,7 @@ class signal_base
 			list_node* prev;
 			list_node* next;
 
-			bool bDeleteRequested;
+			bool deleted;
 		};
 
 		/**
@@ -71,18 +71,10 @@ class signal_base
 		bool unbind(slot_base* slot);
 
 		/**
-		 * Used to obtain the first slot that is connected to this signal. Used for walking the list of slots when a signal is executed.
-		 */
-		list_node* GetFirstNode( void ) const;
-
-		/**
 		 * Functions used to maintain the status of a signal. When a signal is active it means that it is "Emitting". During the emitting
 		 * stage, we are walking the list of slots to allow each slot to react to the signal. There are special considerations that
 		 * must be made when walking the list, such as adding or removing slots during the emit stage. 
 		 */
-		void BeginEmit( void );
-		void EndEmit( void );
-		bool IsSignalEmitting( void ) const;
 
 	private:
 		/**
@@ -114,7 +106,7 @@ class signal_base
 		list_node* head;
 		list_node* tail;
 
-		bool       bEmitting;
+		bool       emitting;
 };
 
 #endif // __signal_base_h__
