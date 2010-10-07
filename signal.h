@@ -1488,7 +1488,7 @@ struct nilarg;
 
 // full template for signal<> (signal<> inherits signal6<>)
 template <typename T_return, typename T_arg0=nilarg, typename T_arg1=nilarg, typename T_arg2=nilarg, typename T_arg3=nilarg, typename T_arg4=nilarg, typename T_arg5=nilarg>
-class signal: public signal6<T_return, T_arg0, T_arg1, T_arg2, T_arg3, T_arg4, T_arg5 { /* empty class */ };
+class signal: public signal6<T_return, T_arg0, T_arg1, T_arg2, T_arg3, T_arg4, T_arg5> { /* empty class */ };
 
 // partial specialization for signal<> with 5 parameters (signal<> inherits signal5<>)
 template <typename T_return, typename T_arg0, typename T_arg1, typename T_arg2, typename T_arg3, typename T_arg4>

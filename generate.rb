@@ -88,7 +88,7 @@ def make_template(nargs)
 
 		text += "template <#{template_params}>\n"
 		if i == nargs
-			text += "class signal: public signal#{i}<#{template_args} { /* empty class */ };\n"
+			text += "class signal: public signal#{i}<#{template_args}> { /* empty class */ };\n"
 		else
 			text += "class signal<#{template_args}>: public signal#{i}<#{template_args}> { /* empty class */ };\n"
 		end
