@@ -4,16 +4,19 @@ cpp-signal
 Introduction
 ------------
 
-This is a simple C++ callback library. It's conceptually similar to FastDelegate,
-with a primary goal of having an extremely simple, clean API. Secondary goals
-include low memory (low template bloat), zero external dependencies, and a high
-level of portability.
+This is a simple C++ callback library. It's conceptually similar to
+FastDelegate, Qt, and countless other "typesafe callbacks in C++" articles
+across the web.
 
-Usage
------
+This library was developed with a primary goal of having an extremely simple,
+clean API. Secondary goals include low memory (low template bloat), zero
+external dependencies, and a high level of portability.
 
-Using the library is incredibly simple. First, add the files to your project, Makefile,
-IDE, etc. Then, to use the library, simply include "signal.h".
+Quick Start
+-----------
+
+Using the library is incredibly simple. First, add the files to your project,
+Makefile, IDE, etc. Then, to use the library, simply include "signal.h".
 
 Here's a simple example:
 
@@ -42,6 +45,13 @@ Here's a simple example:
 			}
 		}
 	}
+
+More thorough examples...
+-------------------------
+
+Under the Hood
+--------------
+
 
 TO DO
 -----
