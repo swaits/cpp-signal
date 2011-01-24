@@ -1,0 +1,393 @@
+#LyX 1.5.0beta1 created this file. For more info see http://www.lyx.org/
+\lyxformat 262
+\begin_document
+\begin_header
+\textclass scrartcl
+\begin_preamble
+\usepackage{listings}
+\end_preamble
+\language english
+\inputencoding auto
+\font_roman times
+\font_sans helvet
+\font_typewriter courier
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\paperfontsize default
+\spacing single
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "swaits" 
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Signals and Slots
+\end_layout
+
+\begin_layout Author
+Stephen Waits
+\end_layout
+
+\begin_layout Date
+November 10, 2006
+\end_layout
+
+\begin_layout Abstract
+This brief document provides an overview of the event and message handling
+ system written for and used in the SCEA NBA PSP projects.
+\end_layout
+
+\begin_layout Section
+Goals
+\end_layout
+
+\begin_layout Itemize
+Basic synchronous messaging
+\end_layout
+
+\begin_layout Itemize
+Decouple game modules
+\end_layout
+
+\begin_layout Itemize
+Appropriate parameter handling (i.e.
+ no blind parms, casting parms, etc.)
+\end_layout
+
+\begin_layout Itemize
+Ease of use
+\end_layout
+
+\begin_layout Itemize
+Lightweight
+\end_layout
+
+\begin_layout Itemize
+Strive for elegant, clean, readable, and maintainable code
+\end_layout
+
+\begin_layout Section
+History
+\end_layout
+
+\begin_layout Standard
+When I started researching event messaging systems and libraries in early
+ 2004, I initially looked at what Qt and other similar libraries used.
+ I ended up discovering libsigc++, which was my introduction to the signal/slot
+ concept.
+ Unfortunately, libsigc++, while fascinating, was much too big for my needs,
+ so, I set out to write my own, simpler, lighter library.
+\end_layout
+
+\begin_layout Standard
+Once I got the library predominately functional, we integrated it into our
+ codebase.
+ I found that it took very little explanation to bring other programmers
+ up to speed on the concepts and practical use of signals and slots.
+ After using them for a bit, everyone on the team agreed that we had benefited
+ greatly from adopting this simple concept throughout our code.
+ The signals rocked for us.
+\end_layout
+
+\begin_layout Standard
+Today, I can confidently say that this single library alone bears great
+ responsibility in the overall cleanliness and readability of our codebase.
+ Without it, we'd have a giant pile of spaghetti by now.
+ Instead, we have clear, simple, decoupled systems which all communicate
+ via a common interface.
+\end_layout
+
+\begin_layout Section
+Usage
+\end_layout
+
+\begin_layout Standard
+Signals are effectively emitters.
+ Slots are effectively callback functions, methods, or functors.
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Standard
+
+
+\backslash
+lstset{language=C++}
+\end_layout
+
+\begin_layout Standard
+
+
+\backslash
+begin{lstlisting}
+\end_layout
+
+\begin_layout Standard
+
+// create a signal
+\end_layout
+
+\begin_layout Standard
+
+Signal< void, int /* x */, int /* y */ > OnClick;
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Standard
+
+// A function matching the signal's type 
+\end_layout
+
+\begin_layout Standard
+
+// (returns void, accepts 2 ints)
+\end_layout
+
+\begin_layout Standard
+
+void beep(int x, int y) { ...
+ }
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Standard
+
+// A class method matching the signal's type
+\end_layout
+
+\begin_layout Standard
+
+// (returns void, accepts 2 ints)
+\end_layout
+
+\begin_layout Standard
+
+struct Bark { void woof(int x, int y); }
+\end_layout
+
+\begin_layout Standard
+
+Bark barker;
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Standard
+
+// connect a regular function
+\end_layout
+
+\begin_layout Standard
+
+OnClick.Connect( beep ); // beep becomes a Slot<void,int,int>
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Standard
+
+// connect a member of a specific object
+\end_layout
+
+\begin_layout Standard
+
+OnClick.Connect( &barker, &Bark::woof ); // woof is a Slot
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Standard
+
+// emit
+\end_layout
+
+\begin_layout Standard
+
+OnClick(10,20); // calls beep(10,20) and barker.woof(10,20)
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Standard
+
+// disconnect
+\end_layout
+
+\begin_layout Standard
+
+OnClick.Disconnect( beep );
+\end_layout
+
+\begin_layout Standard
+
+OnClick.Disconnect( &barker, &Bark::woof );
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Standard
+
+// note that this won't compile (type safety)
+\end_layout
+
+\begin_layout Standard
+
+void badbeep(int x, float y); // parameter mismatch
+\end_layout
+
+\begin_layout Standard
+
+OnClick.Connect( badbeep ); // compile-time error!
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Standard
+
+
+\backslash
+end{lstlisting}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+In Practice
+\end_layout
+
+\begin_layout Standard
+In our projects, we primarily use signals in two ways.
+\end_layout
+
+\begin_layout Standard
+First, we maintain a master list of global signals.
+ These handle things such as a player stepping out of bounds, the ball hitting
+ the backboard, a team calling timeout, and, basically everything that happens
+ in basketball.
+ This list of signals has grown quite large, but remains organized.
+\end_layout
+
+\begin_layout Standard
+Second, some classes include public signals.
+ For example, class Clock might have a public signal named "Changed" which
+ gets emitted any time its internal time is updated.
+ The Clock object doesn't have to care if anyone connects - its responsibility
+ ends at emission.
+ Our UI system also makes heavy use of signals.
+\end_layout
+
+\begin_layout Section
+Summary
+\end_layout
+
+\begin_layout Subsection
+Positives
+\end_layout
+
+\begin_layout Itemize
+Simple code is easy to use
+\end_layout
+
+\begin_layout Itemize
+Emitter/Subscriber model is rather nice to use and allows for massive decoupling
+\end_layout
+
+\begin_layout Itemize
+Synchronous emission
+\end_layout
+
+\begin_layout Itemize
+Static type safety (this is a huge plus!!!)
+\end_layout
+
+\begin_layout Itemize
+Very easy to add to your project (it's almost entirely a template library)
+\end_layout
+
+\begin_layout Subsection
+Negatives
+\end_layout
+
+\begin_layout Itemize
+Current implementation does use some dynamic memory
+\end_layout
+
+\begin_layout Itemize
+Requires RTTI
+\begin_inset Foot
+status open
+
+\begin_layout Standard
+RTTI is commonly thought to be the devil amongst uninformed game programmers;
+ however, the only expense is one of a very slight size increase.
+ Performance, possible slight caching consequences aside, generally remains
+ the same.
+ The convenience, in my opinion, vastly outweighs the cost.
+\end_layout
+
+\end_inset
+
+; though only on Connect/Disconnect/IsConnected calls (normally infrequent)
+\end_layout
+
+\begin_layout Itemize
+Not a negative to most, but does use some template-fu to keep things easy
+ on the outside
+\end_layout
+
+\begin_layout Itemize
+Related to the template-fu, they can bloat; however, we've done our best
+ to minimize this
+\end_layout
+
+\begin_layout Itemize
+Return value heuristic never reached (i.e.
+ what does the emitter return when calling multiple slots?)
+\end_layout
+
+\end_body
+\end_document
