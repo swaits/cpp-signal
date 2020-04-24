@@ -1,2 +1,63 @@
-Signal pub/sub callback library in C++. Inspired by FastDelegate, with a
-primary goal of a simple, clean interface.
+cpp-signal
+==========
+
+Introduction
+------------
+
+This is a simple C++ callback library. It's conceptually similar to
+FastDelegate, Qt, and countless other "typesafe callbacks in C++" articles
+across the web.
+
+This library was developed with a primary goal of having an extremely simple,
+clean API. Secondary goals include low memory (low template bloat), zero
+external dependencies, and a high level of portability.
+
+Quick Start
+-----------
+
+Using the library is incredibly simple. First, add the files to your project,
+Makefile, IDE, etc. Then, to use the library, simply include "signal.h".
+
+Here's a simple example:
+
+	#include "signal.h"
+	
+	void beep() { /* make speaker beep */ }
+
+	void flash() { /* make screen flash */ }
+
+	int main(int arg, char** argv)
+	{
+		// create a signal which we'll emit any time a button is pressed
+		signal<void> button_pressed;
+
+		// connect (i.e. subscribe) functions to the signal
+		button_pressed.connect(&beep);
+		button_pressed.connect(&flash);
+
+		// main loop, check for button press, and call signal
+		while ( true )
+		{
+			if ( is_button_pressed() )
+			{
+				// call signal, which in turn calls all slot functionss (i.e. subscribers)
+				button_pressed();
+			}
+		}
+	}
+
+More thorough examples...
+-------------------------
+
+Under the Hood
+--------------
+
+
+TO DO
+-----
+
+* better documentation
+* consistent code cleanup
+* generate.rb creates a single header file
+* add License clause to source and LICENSE file
+
